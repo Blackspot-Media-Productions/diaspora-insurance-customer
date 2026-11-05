@@ -32,6 +32,7 @@ const initialFormState = {
 
 export default function HomepageUI() {
   const [formData, setFormData] = useState(initialFormState);
+  const [loading, setLoading] = useState(false);
   const [otherToggles, setOtherToggles] = useState({
     contact_source: false,
     first_enquiry_channel: false,
@@ -54,7 +55,9 @@ export default function HomepageUI() {
         setFormData((prevForm) => ({
           ...prevForm,
           [groupName]: isArrayValue
-            ? (prevForm[formGroupName] as string[]).filter((p: string) => p !== value)
+            ? (prevForm[formGroupName] as string[]).filter(
+                (p: string) => p !== value,
+              )
             : value,
         }));
       }
@@ -69,13 +72,16 @@ export default function HomepageUI() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: Array.isArray(formData[name as keyof typeof formData]) ? [...prev[name as keyof typeof formData], value] : value,
+      [name]: Array.isArray(formData[name as keyof typeof formData])
+        ? [...prev[name as keyof typeof formData], value]
+        : value,
     }));
   };
 
   const handleCheckboxChange = (groupName: string, value: string) => {
     setFormData((prev) => {
-      const current = (prev[groupName as keyof typeof formData] || []) as string[];
+      const current = (prev[groupName as keyof typeof formData] ||
+        []) as string[];
       if (Array.isArray(current)) {
         const updated = current.includes(value)
           ? current.filter((item: string) => item !== value)
@@ -83,13 +89,13 @@ export default function HomepageUI() {
         return { ...prev, [groupName]: updated };
       }
 
-      return prev
+      return prev;
     });
   };
 
-  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors({})
+    setErrors({});
 
     const form = e.currentTarget;
     const newErrors: typeof errors = {};
@@ -113,18 +119,43 @@ export default function HomepageUI() {
       return;
     }
 
-    setAlert({
-      show: true,
-      type: "success",
-      message: "Thank you! Your questionnaire has been submitted successfully.",
-    });
+    try {
+      const response = await fetch("/api/send-mail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    // Scroll to the top alert
-    window.scrollTo({ top: 0, behavior: "smooth" });
+      if (!response.ok || !response.body) {
+        const data = await response.json();
+        throw new Error(data.error ?? "The response could not be sent.");
+      }
 
-    // Reset form & errors on success
-    setFormData(initialFormState);
-    setErrors({});
+      setAlert({
+        show: true,
+        type: "success",
+        message:
+          "Thank you! Your questionnaire has been submitted successfully.",
+      });
+
+      // Scroll to the top alert
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // Reset form & errors on success
+      setFormData(initialFormState);
+      setErrors({});
+    } catch (requestError) {
+      setAlert({
+        show: true,
+        type: "danger",
+        message:
+          requestError instanceof Error
+            ? requestError.message
+            : "The response could not be sent.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -156,9 +187,10 @@ export default function HomepageUI() {
             <p className="text-sm text-[#6c6c75] mb-4 leading-relaxed">
               This form helps us understand your business, purpose, your
               audience, your goals, and where your brand currently stands, so we
-              can develop a strategy that drives real growth. Whether you&apos;re a
-              startup finding your voice or an established business ready to
-              rebrand, your answers shape everything we build together.
+              can develop a strategy that drives real growth. Whether
+              you&apos;re a startup finding your voice or an established
+              business ready to rebrand, your answers shape everything we build
+              together.
             </p>
             <p className="text-sm italic text-[#6c6c75] mb-4">
               Please take your time to be as detailed as possible. The more we
