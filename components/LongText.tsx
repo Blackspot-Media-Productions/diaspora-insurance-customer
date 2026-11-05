@@ -8,6 +8,7 @@ type Props = {
   required?: boolean;
   value: string;
   name: string;
+  placeholder?: string;
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
@@ -24,6 +25,7 @@ export default function LongText({ required = false, ...props }: Props) {
           rows={3}
           value={props.value}
           onChange={props.onChange}
+          placeholder={props.placeholder || ""}
           required
         ></textarea>
         {props.hasError && (

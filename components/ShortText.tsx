@@ -8,6 +8,7 @@ type Props = {
   required?: boolean;
   value: string;
   name: string;
+  placeholder?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   className?: string;
 };
@@ -27,6 +28,7 @@ export default function ShortText({ required = false, ...props }: Props) {
           name={props.name}
           value={props.value}
           onChange={props.onChange}
+          placeholder={props.placeholder || ""}
           required
         />
         {props.hasError && (

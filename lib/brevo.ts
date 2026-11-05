@@ -12,13 +12,8 @@ export async function sendBrevoTransactionalEmail(
   }
 
   await brevo().transactionalEmails.sendTransacEmail({
-    sender: { email: "productmanager@theblackspotgroup.com" },
-    to: [
-      {
-        email: "productmanager@theblackspotgroup.com",
-        name: "Diaspora Insurance Questionnaire",
-      },
-    ],
+    sender: { name: "Diaspora Insurance Questionnaire" },
+    to: [ { email: "info@theblackspotgroup.com" } ],
     subject: "Customer Feedback from Questionnaire",
     htmlContent: `
     <!DOCTYPE html>
