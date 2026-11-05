@@ -23,6 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${bricolage.variable} h-full antialiased`}
     >
+      <title>Diaspora Insurance Questionnaire</title>
       <body className={`min-h-full flex flex-col ${manrope.className}`}>{children}</body>
     </html>
   );

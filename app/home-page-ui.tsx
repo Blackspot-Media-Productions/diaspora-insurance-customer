@@ -32,7 +32,7 @@ const initialFormState = {
 
 export default function HomepageUI() {
   const [formData, setFormData] = useState(initialFormState);
-  const [_, setOtherToggles] = useState({
+  const [otherToggles, setOtherToggles] = useState({
     contact_source: false,
     first_enquiry_channel: false,
   });
@@ -44,14 +44,17 @@ export default function HomepageUI() {
   >({});
 
   const handleOtherToggle = (groupName: string, value?: string) => {
+    const toggleGroupName = groupName as keyof typeof otherToggles;
+    const formGroupName = groupName as keyof typeof formData;
+
     setOtherToggles((prev) => {
-      const nextState = !prev[groupName];
-      const isArrayValue = Array.isArray(formData[groupName]);
+      const nextState = !prev[toggleGroupName];
+      const isArrayValue = Array.isArray(formData[formGroupName]);
       if (!nextState) {
         setFormData((prevForm) => ({
           ...prevForm,
           [groupName]: isArrayValue
-            ? prevForm[groupName].filter((p: string) => p !== value)
+            ? (prevForm[formGroupName] as string[]).filter((p: string) => p !== value)
             : value,
         }));
       }
@@ -66,17 +69,21 @@ export default function HomepageUI() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: Array.isArray(formData[name]) ? [...prev[name], value] : value,
+      [name]: Array.isArray(formData[name as keyof typeof formData]) ? [...prev[name as keyof typeof formData], value] : value,
     }));
   };
 
   const handleCheckboxChange = (groupName: string, value: string) => {
     setFormData((prev) => {
-      const current = prev[groupName] || [];
-      const updated = current.includes(value)
-        ? current.filter((item: string) => item !== value)
-        : [...current, value];
-      return { ...prev, [groupName]: updated };
+      const current = (prev[groupName as keyof typeof formData] || []) as string[];
+      if (Array.isArray(current)) {
+        const updated = current.includes(value)
+          ? current.filter((item: string) => item !== value)
+          : [...current, value];
+        return { ...prev, [groupName]: updated };
+      }
+
+      return prev
     });
   };
 
@@ -91,7 +98,7 @@ export default function HomepageUI() {
     if (!isValid) {
       Object.entries(formData).forEach(([key, value]) => {
         if (value === "" || value.length === 0) {
-          newErrors[key] = true;
+          newErrors[key as keyof typeof errors] = true;
         }
       });
 
