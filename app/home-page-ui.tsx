@@ -357,9 +357,10 @@ export default function HomepageUI() {
               <button
                 type="submit"
                 id="submitBtn"
+                disabled={loading}
                 className="bg-brand hover:bg-[#e07f00] text-white font-semibold py-3 px-12 rounded-lg text-lg transition-colors duration-200 border border-brand"
               >
-                Submit Questionnaire
+                {loading ? "Sending..." : "Submit Questionnaire"}
               </button>
             </div>
           </form>
