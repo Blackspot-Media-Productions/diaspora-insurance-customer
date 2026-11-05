@@ -120,6 +120,8 @@ export default function HomepageUI() {
     }
 
     try {
+      setLoading(true);
+
       const response = await fetch("/api/send-mail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
