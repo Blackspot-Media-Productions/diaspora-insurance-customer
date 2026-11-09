@@ -38,7 +38,11 @@ export default function HomepageUI() {
     first_enquiry_channel: false,
   });
 
-  const [alert, setAlert] = useState({ show: false, type: "", message: "" });
+  const [alert, setAlert] = useState({
+    show: false,
+    type: "",
+    message: '',
+  });
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof typeof formData, boolean>>
@@ -88,7 +92,9 @@ export default function HomepageUI() {
         []) as string[];
 
       if (Array.isArray(current)) {
-        const hasOther = current.some((c) => ["other", "others"].includes(c.toLowerCase()))
+        const hasOther = current.some((c) =>
+          ["other", "others"].includes(c.toLowerCase()),
+        );
         const isOther = ["other", "others"].includes(value.toLowerCase());
         const itemSet = new Set(groupItems);
         const isInvalidSelection = !itemSet.has(value);
@@ -98,7 +104,9 @@ export default function HomepageUI() {
 
         if ((isOther && hasInvalidSelection) || isInvalidSelection) {
           if (isInvalidSelection) {
-            const filteredList = current.filter((c) => ["other", "others"].includes(c.toLowerCase()))
+            const filteredList = current.filter((c) =>
+              ["other", "others"].includes(c.toLowerCase()),
+            );
             updated = hasOther ? [...filteredList, value] : [...current, value];
           } else if (isOther) {
             if (hasInvalidSelection) {
@@ -162,8 +170,9 @@ export default function HomepageUI() {
       setAlert({
         show: true,
         type: "success",
-        message:
-          "Thank you! Your questionnaire has been submitted successfully.",
+        // message:
+        //   "Thank you! Your questionnaire has been submitted successfully.",
+        message: `Thank you for your feedback.\nIt will help improve the service Diaspora Insurance gives you and your family.\nIf you entered the voucher draw and are one of the 8 people selected, we will contact you by email within 3 of the closing date.`,
       });
 
       // Scroll to the top alert
@@ -186,8 +195,6 @@ export default function HomepageUI() {
     }
   };
 
-  console.log(formData.contact_source);
-
   return (
     <div className="w-full">
       {/* Top bar */}
@@ -197,7 +204,7 @@ export default function HomepageUI() {
         {/* Form Card Container */}
         <div className="bg-white rounded-[14px] p-6 sm:p-[2.5rem_2.25rem] shadow-[0_10px_30px_rgba(0,0,0,0.06)] mx-auto max-w-190">
           {/* Header */}
-          <div className="text-center mb-6">
+          <div className="mb-6">
             <Image
               src="/logo.png"
               alt="BlackSpot Media"
@@ -208,27 +215,62 @@ export default function HomepageUI() {
                 e.currentTarget.style.display = "none";
               }}
             />
-            <h1 className="font-title font-bold text-[1.6rem] leading-tight mb-2">
+            {/*<h1 className="font-title font-bold text-[1.6rem] leading-tight mb-2">
               Diaspora Insurance Customer Questionnaire
+            </h1>*/}
+            <h1 className="font-title text-center font-bold text-[1.6rem] leading-tight mb-2">
+              Share your views on Diaspora Insurance for a chance to receive a
+              £50 voucher
             </h1>
-            <p className="text-[#6c6c75] text-base mb-1">
-              Thank you for choosing to work with us.
+            <p className="text-[#6c6c75] text-base mb-3">
+              <b className="text-black">Who we are.</b>&nbsp;Diaspora Insurance
+              is carrying out a customer survey, supported by Blackspot Media
+              Productions, a full-service digital marketing, IT and media
+              agency.
             </p>
-            <p className="text-sm text-[#6c6c75] mb-4 leading-relaxed">
-              This form helps us understand your business, purpose, your
-              audience, your goals, and where your brand currently stands, so we
-              can develop a strategy that drives real growth. Whether
-              you&apos;re a startup finding your voice or an established
-              business ready to rebrand, your answers shape everything we build
-              together.
+            <p className="text-[#6c6c75] text-base mb-3">
+              <b className="text-black">What the survey is for.</b>&nbsp;We want
+              to understand how people find Diaspora Insurance, how clear the
+              products are, how easy it is to enquire, buy, pay and claim, and
+              what could be better, especially for customers living abroad.
             </p>
-            <p className="text-sm italic text-[#6c6c75] mb-4">
-              Please take your time to be as detailed as possible. The more we
-              know, the better we can serve you.
+            <p className="text-[#6c6c75] text-base mb-3">
+              <b className="text-black">How you benefit.</b>&nbsp;Your answers
+              will help Diaspora Insurance improve its information, service and
+              communication for you and your family. As a thank-you, everyone
+              who completes the questionnaire by 12 November 2026 will be
+              entered into a random draw for one of 8 vouchers worth £50 each.
+              Full draw terms are at the end of the questionnaire.
             </p>
-            <p className="text-sm font-bold text-[#14141a]">
-              Note: following the submission of this form, your brand
-              consultation document will be delivered within 5 working days.
+            <p className="text-[#6c6c75] text-base mb-3">
+              <b className="text-black">Your privacy.</b>&nbsp;The questionnaire
+              takes approximately 8 minutes to complete. Diaspora Insurance will
+              use the information collected to assess customer experiences and
+              identify opportunities to improve its products, services and
+              communication.
+              <br className="mb-2.5" />
+              Blackspot Media Productions is supporting the administration of
+              this survey and will handle any personal information shared with
+              them in accordance with applicable data protection requirements
+              and agreed safeguards.
+              <br className="mb-2.5" />
+              Survey responses will be reported in aggregated form wherever
+              possible. Your name and email address, where provided for the
+              voucher draw, will be used solely to administer the draw and
+              contact selected recipients. These details will not be used for
+              unrelated marketing purposes.
+              <br className="mb-2.5" />
+              Your information is stored securely and kept for retention period,
+              then securely deleted. Access is limited to g. the Blackspot audit
+              team and named Diaspora Insurance staff.
+              <br className="mb-2.5" />
+              <i>
+                Please do not include policy numbers, payment details or other
+                sensitive personal information in your responses. Further
+                information on how your personal information is processed and
+                protected, and how you may exercise your data protection rights,
+                is available in the privacy notice
+              </i>
             </p>
           </div>
 
@@ -236,7 +278,7 @@ export default function HomepageUI() {
           {alert.show && (
             <div
               id="formAlert"
-              className={`p-4 mb-4 text-sm rounded-lg border ${
+              className={`p-4 mb-4 text-sm rounded-lg border leading-relaxed whitespace-pre-line ${
                 alert.type === "success"
                   ? "bg-green-50 border-green-200 text-green-800"
                   : "bg-error-background border-error-border text-error-content"
@@ -287,15 +329,18 @@ export default function HomepageUI() {
                 onChange: (value) => {
                   setFormData((prev) => {
                     const sourceWithoutOther = prev.contact_source.filter(
-                      (cs) => !["other", "others"].includes((cs as string).toLowerCase()),
+                      (cs) =>
+                        !["other", "others"].includes(
+                          (cs as string).toLowerCase(),
+                        ),
                     );
 
                     let update = sourceWithoutOther;
                     if (value !== "") {
-                      update = [...update, value as never]
+                      update = [...update, value as never];
                     }
 
-                    return { ...prev, contact_source: update }
+                    return { ...prev, contact_source: update };
                   });
                 },
               }}
@@ -412,6 +457,48 @@ export default function HomepageUI() {
               </button>
             </div>
           </form>
+
+          <div className="mt-8">
+            <p className="font-bold mb-2">
+              Voucher draw: terms and conditions{" "}
+            </p>
+
+            <ul className="list-disc list-inside text-sm text-[#6c6c75] space-y-2 leading-relaxed">
+              <li>
+                <b className="text-black">Closing date:</b>&nbsp; 12 November
+                2026 (the questionnaire must be completed by this date to
+                enter).
+              </li>
+              <li>
+                <b className="text-black">Eligibility:</b>&nbsp; Diaspora
+                Insurance customers who received an invitation; one entry per
+                person; 18 or over; employees of Diaspora Insurance and
+                Blackspot Media Productions excluded
+              </li>
+              <li>
+                <b className="text-black">Entry:</b>&nbsp; Giving your name and
+                email address is optional, but needed to be entered into the
+                draw.
+              </li>
+              <li>
+                <b className="text-black">Selection:</b>&nbsp; Eight recipients
+                will be selected at random from all eligible completed entries.
+                Each receives one £50 voucher).
+              </li>
+              <li>
+                <b className="text-black">Notification:</b>&nbsp; Selected
+                recipients will be contacted by email within 3 days of the
+                closing date.
+              </li>
+              <li>
+                <b className="text-black">
+                  If a recipient cannot be contacted:
+                </b>
+                &nbsp; If a selected recipient does not respond within 2 days,
+                another recipient will be drawn at random.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
