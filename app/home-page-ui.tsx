@@ -78,14 +78,40 @@ export default function HomepageUI() {
     }));
   };
 
-  const handleCheckboxChange = (groupName: string, value: string) => {
+  const handleCheckboxChange = (
+    groupName: string,
+    groupItems: string[],
+    value: string,
+  ) => {
     setFormData((prev) => {
       const current = (prev[groupName as keyof typeof formData] ||
         []) as string[];
+
       if (Array.isArray(current)) {
-        const updated = current.includes(value)
-          ? current.filter((item: string) => item !== value)
-          : [...current, value];
+        const hasOther = current.some((c) => ["other", "others"].includes(c.toLowerCase()))
+        const isOther = ["other", "others"].includes(value.toLowerCase());
+        const itemSet = new Set(groupItems);
+        const isInvalidSelection = !itemSet.has(value);
+        const hasInvalidSelection = current.some((s) => !itemSet.has(s));
+
+        let updated = [...current];
+
+        if ((isOther && hasInvalidSelection) || isInvalidSelection) {
+          if (isInvalidSelection) {
+            const filteredList = current.filter((c) => ["other", "others"].includes(c.toLowerCase()))
+            updated = hasOther ? [...filteredList, value] : [...current, value];
+          } else if (isOther) {
+            if (hasInvalidSelection) {
+              const filteredList = current.filter((c) => itemSet.has(c));
+              updated = [...filteredList];
+            }
+          }
+        } else {
+          updated = current.includes(value)
+            ? current.filter((item: string) => item !== value)
+            : [...current, value];
+        }
+
         return { ...prev, [groupName]: updated };
       }
 
@@ -160,6 +186,8 @@ export default function HomepageUI() {
     }
   };
 
+  console.log(formData.contact_source);
+
   return (
     <div className="w-full">
       {/* Top bar */}
@@ -220,13 +248,22 @@ export default function HomepageUI() {
           )}
 
           <form id="consultationForm" onSubmit={handleSubmit} noValidate>
-            <LongText
-              label="How did you first hear about Diaspora Insurance?"
+            <Radio
+              items={socialPlatforms}
               name="referral_source"
+              idPrefix="rs"
+              label="How did you first hear about Diaspora Insurance?"
               required
               hasError={errors.referral_source || false}
               onChange={handleInputChange}
-              value={formData.referral_source}
+              selected={formData.referral_source}
+              hasOtherInput={{
+                status: ["other", "others"].includes(
+                  formData.referral_source.toLowerCase(),
+                ),
+                onChange: (value) =>
+                  setFormData((prev) => ({ ...prev, referral_source: value })),
+              }}
             />
 
             <Checkbox
@@ -237,20 +274,29 @@ export default function HomepageUI() {
               items={socialPlatforms}
               hasError={errors.contact_source || false}
               onChange={(value) =>
-                handleCheckboxChange("contact_source", value)
+                handleCheckboxChange("contact_source", socialPlatforms, value)
               }
               required
               triggerOtherToggle={(name, value) =>
                 handleOtherToggle(name, value)
               }
               hasOtherInput={{
-                status: true,
+                status: formData.contact_source.some((cs) =>
+                  ["other", "others"].includes((cs as string).toLowerCase()),
+                ),
                 onChange: (value) => {
-                  if (value !== "") {
-                    handleInputChange({
-                      target: { name: "contact_source", value },
-                    } as ChangeEvent<HTMLInputElement>);
-                  }
+                  setFormData((prev) => {
+                    const sourceWithoutOther = prev.contact_source.filter(
+                      (cs) => !["other", "others"].includes((cs as string).toLowerCase()),
+                    );
+
+                    let update = sourceWithoutOther;
+                    if (value !== "") {
+                      update = [...update, value as never]
+                    }
+
+                    return { ...prev, contact_source: update }
+                  });
                 },
               }}
             />

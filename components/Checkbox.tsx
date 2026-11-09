@@ -30,16 +30,29 @@ export default function Checkbox({ required = false, ...props }: Props) {
 
   return (
     <div className="mb-3">
-      {props.label && <label className="block mb-2 text-sm font-medium text-[#14141a]">
-        {props.label} {required && "*"}
-      </label>}
-      <div className={`border ${props.hasError ? "border-error-border" : "border-[#eee]"} rounded-[10px] p-[0.9rem_1rem] bg-[#fffaf2]`}>
+      {props.label && (
+        <label className="block mb-2 text-sm font-medium text-[#14141a]">
+          {props.label} {required && "*"}
+        </label>
+      )}
+      <div
+        className={`border ${props.hasError ? "border-error-border" : "border-[#eee]"} rounded-[10px] p-[0.9rem_1rem] bg-[#fffaf2]`}
+      >
         {props.items.map((item) => {
           const isOther = ["other", "others"].includes(item.toLowerCase());
           const itemSet = new Set(props.items);
           const hasInvalidSelection = props.selected.some(
             (s) => !itemSet.has(s),
           );
+
+          const isChecked =
+            props.selected.includes(item)
+              ? true
+              : isOther
+                ? hasInvalidSelection
+                  ? true
+                  : false
+                : false;
 
           return (
             <div key={item} className="flex items-center mb-[0.4rem]">
@@ -48,20 +61,11 @@ export default function Checkbox({ required = false, ...props }: Props) {
                 id={`${props.idPrefix}-${item}`}
                 name={props.name}
                 value={item}
-                checked={
-                  props.selected.includes(item) && !isOther
-                    ? true
-                    : isOther && hasInvalidSelection
-                      ? true
-                      : false
-                }
+                checked={isChecked}
                 onChange={(e) => {
-                  if (isOther) {
-                    props.triggerOtherToggle(props.name, otherOptionValue);
-                    if (!e.target.checked) setOtherOptionValue("");
-                    if (e.target.checked) setShowOtherInput(true);
-                  } else {
-                    props.onChange(item);
+                  props.onChange(item);
+                  if (isOther && hasInvalidSelection && !e.target.checked) {
+                    setOtherOptionValue("");
                   }
                 }}
                 className="w-4 h-4 text-brand bg-white border-gray-300 rounded focus:ring-brand focus:ring-2 accent-brand"
@@ -88,7 +92,7 @@ export default function Checkbox({ required = false, ...props }: Props) {
         ></textarea>
       )}
 
-      {props.hasOtherInput?.status && showOtherInput && (
+      {props.hasOtherInput?.status && (
         <div className="flex gap-x-2 mt-1">
           <input
             type="text"
@@ -101,7 +105,7 @@ export default function Checkbox({ required = false, ...props }: Props) {
           <button
             type="button"
             onClick={() => {
-              props.hasOtherInput?.onChange(otherOptionValue)
+              props.hasOtherInput?.onChange(otherOptionValue);
               setShowOtherInput(false);
             }}
             className="text-xs bg-brand px-6 rounded cursor-pointer"
